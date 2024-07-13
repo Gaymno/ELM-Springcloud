@@ -1,0 +1,106 @@
+server:
+  port: 12001
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        failure-rate-threshold: 30
+        minimum-number-of-calls: 1
+        sliding-window-type: TIME_BASED
+        sliding-window-size: 10
+        automatic-transition-from-open-to-half-open-enabled: true
+        wait-duration-in-open-state: 2s
+        permitted-number-of-calls-in-half-open-state: 3
+        record-exceptions:
+          - java.lang.Exception
+    instances:
+      backendA:
+        base-config: default
+
+spring:
+  application:
+    name: "gateway-server"
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: 8969138
+  main:
+    web-application-type: reactive
+  cloud:
+    gateway:
+      routes:
+        - id: businessServer
+          uri: lb://business-server
+          predicates:
+            - Path=/BusinessController/listBusinessByOrderTypeId,/BusinessController/getBusinessById
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+                redis-rate-limiter.requestedTokens: 1
+                key-resolver: "#{@ipKeyResolver}"
+        - id: userServer
+          uri: lb://user-server
+          predicates:
+            - Path=/UserController/getUserByIdByPass,/UserController/getUserById,/UserController/saveUser
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: backendA
+                fallbackUri: forward:/fallback
+        - id: ordersServer
+          uri: lb://orders-server
+          predicates:
+            - Path=/OrdersController/createOrders,/OrdersController/getOrdersById,/OrdersController/listOrdersByUserId,/OrdersController/confirmOrder
+        - id: foodServer
+          uri: lb://food-server
+          predicates:
+            - Path=/FoodController/listFoodByBusinessId
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+                redis-rate-limiter.requestedTokens: 1
+                key-resolver: "#{@ipKeyResolver}"
+        - id: addressServer
+          uri: lb://address-server
+          predicates:
+            - Path=/DeliveryAddressController/listDeliveryAddressByUserId,/DeliveryAddressController/getDeliveryAddressById,/DeliveryAddressController/saveDeliveryAddress,/DeliveryAddressController/updateDeliveryAddress,/DeliveryAddressController/removeDeliveryAddress
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+                redis-rate-limiter.requestedTokens: 1
+                key-resolver: "#{@ipKeyResolver}"
+        - id: cartServer
+          uri: lb://cart-server
+          predicates:
+            - Path=/CartController/listCart,/CartController/saveCart,/CartController/updateCart,/CartController/removeCart
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+                redis-rate-limiter.requestedTokens: 1
+                key-resolver: "#{@ipKeyResolver}"
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowed-origins: "*"
+            allowed-methods: "GET, HEAD, POST, PUT, DELETE, OPTIONS"
+            allowed-headers: "*"
+
+eureka:
+  client:
+    service-url:
+      defaultZone: "http://eurekaServer18000:18000/eureka/,http://eurekaServer18001:18001/eureka/"
+  instance:
+    prefer-ip-address: true
+    instance-id: "${spring.cloud.client.ip-address}:${server.port}"
+    lease-renewal-interval-in-seconds: 5
+    lease-expiration-duration-in-seconds: 15

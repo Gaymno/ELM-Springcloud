@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.mapper.CartMapper">
+    <select id="listCart" resultMap="CartResultMap">
+        SELECT c.*, f.*, b.*
+        FROM cart c
+        LEFT JOIN food f ON c.foodId = f.foodId
+        LEFT JOIN business b ON c.businessId = b.businessId
+        WHERE c.userId = #{userId} AND c.businessId = #{businessId}
+    </select>
+
+    <resultMap id="CartResultMap" type="org.example.po.Cart">
+        <id property="cartId" column="cartId"/>
+        <result property="foodId" column="foodId"/>
+        <result property="businessId" column="businessId"/>
+        <result property="userId" column="userId"/>
+        <result property="quantity" column="quantity"/>
+        <association property="food" column="foodId" javaType="org.example.po.Food">
+            <id property="foodId" column="foodId"/>
+            <result property="foodName" column="foodName"/>
+            <result property="foodExplain" column="foodExplain"/>
+            <result property="foodImg" column="foodImg"/>
+            <result property="foodPrice" column="foodPrice"/>
+            <result property="businessId" column="businessId"/>
+            <result property="remarks" column="remarks"/>
+        </association>
+        <association property="business" column="businessId" javaType="org.example.po.Business">
+            <id property="businessId" column="businessId"/>
+            <result property="businessName" column="businessName"/>
+            <result property="businessAddress" column="businessAddress"/>
+            <result property="businessExplain" column="businessExplain"/>
+            <result property="businessImg" column="businessImg"/>
+            <result property="orderTypeId" column="orderTypeId"/>
+            <result property="starPrice" column="starPrice"/>
+            <result property="deliveryPrice" column="deliveryPrice"/>
+            <result property="remarks" column="remarks"/>
+        </association>
+    </resultMap>
+</mapper>

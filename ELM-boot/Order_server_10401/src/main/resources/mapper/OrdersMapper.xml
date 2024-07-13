@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.mapper.OrdersMapper">
+
+    <resultMap id="OrderResultMap" type="org.example.po.Orders">
+        <id property="orderId" column="orderId"/>
+        <result property="userId" column="userId"/>
+        <result property="businessId" column="businessId"/>
+        <result property="orderDate" column="orderDate"/>
+        <result property="orderTotal" column="orderTotal"/>
+        <result property="daId" column="daId"/>
+        <result property="orderState" column="orderState"/>
+        <association property="business" column="businessId" javaType="org.example.po.Business">
+            <id property="businessId" column="businessId"/>
+            <result property="businessName" column="businessName"/>
+            <result property="businessAddress" column="businessAddress"/>
+            <result property="businessExplain" column="businessExplain"/>
+            <result property="businessImg" column="businessImg"/>
+            <result property="orderTypeId" column="orderTypeId"/>
+            <result property="starPrice" column="starPrice"/>
+            <result property="deliveryPrice" column="deliveryPrice"/>
+            <result property="remarks" column="remarks"/>
+        </association>
+        <collection property="list" column="orderId" javaType="ArrayList" ofType="org.example.po.OrderDetailet">
+            <id property="odId" column="odId"/>
+            <result property="orderId" column="orderId"/>
+            <result property="foodId" column="foodId"/>
+            <result property="quantity" column="quantity"/>
+            <association property="food" column="foodId" javaType="org.example.po.Food">
+                <id property="foodId" column="foodId"/>
+                <result property="foodName" column="foodName"/>
+                <result property="foodExplain" column="foodExplain"/>
+                <result property="foodImg" column="foodImg"/>
+                <result property="foodPrice" column="foodPrice"/>
+                <result property="businessId" column="businessId"/>
+                <result property="remarks" column="remarks"/>
+            </association>
+        </collection>
+    </resultMap>
+
+    <select id="getOrdersById" resultMap="OrderResultMap">
+        SELECT
+            o.*,
+            b.businessId AS b_businessId,
+            b.businessName,
+            b.businessAddress,
+            b.businessExplain,
+            b.businessImg,
+            b.orderTypeId,
+            b.starPrice,
+            b.deliveryPrice,
+            b.remarks,
+            od.odId AS od_odId,
+            od.orderId AS od_orderId,
+            od.foodId,
+            od.quantity,
+            f.foodId AS f_foodId,
+            f.foodName,
+            f.foodExplain,
+            f.foodImg,
+            f.foodPrice,
+            f.businessId AS f_businessId,
+            f.remarks
+        FROM orders o
+                 LEFT JOIN business b ON o.businessId = b.businessId
+                 LEFT JOIN orderdetailet od ON o.orderId = od.orderId
+                 LEFT JOIN food f ON od.foodId = f.foodId
+        WHERE o.orderId = #{orderId}
+    </select>
+    <select id="listOrdersByUserId" resultMap="OrderResultMap">
+        SELECT
+            o.*,
+            b.businessId AS b_businessId,
+            b.businessName,
+            b.businessAddress,
+            b.businessExplain,
+            b.businessImg,
+            b.orderTypeId,
+            b.starPrice,
+            b.deliveryPrice,
+            b.remarks,
+            od.odId AS od_odId,
+            od.orderId AS od_orderId,
+            od.foodId,
+            od.quantity,
+            f.foodId AS f_foodId,
+            f.foodName,
+            f.foodExplain,
+            f.foodImg,
+            f.foodPrice,
+            f.businessId AS f_businessId,
+            f.remarks
+        FROM orders o
+                 LEFT JOIN business b ON o.businessId = b.businessId
+                 LEFT JOIN orderdetailet od ON o.orderId = od.orderId
+                 LEFT JOIN food f ON od.foodId = f.foodId
+        WHERE o.userId = #{userId}
+        ORDER BY o.orderDate DESC
+    </select>
+</mapper>

@@ -1,0 +1,23 @@
+eureka:
+  instance:
+    prefer-ip-address: true
+    instance-id: "${spring.cloud.client.ip-address}:${server.port}"
+    lease-renewal-interval-in-seconds: 5
+    lease-expiration-duration-in-seconds: 15
+  client:
+    service-url:
+      defaultZone: "http://eurekaServer11000:11000/eureka/,http://eurekaServer11001:11001/eureka/"
+spring:
+  cloud:
+    config:
+      profile: dev
+      label: master
+      name: orderItem_server_10301
+      discovery:
+        enabled: true
+        service-id: config-server
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest

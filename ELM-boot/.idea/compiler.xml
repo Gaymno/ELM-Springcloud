@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="Cart_server_10500" />
+        <module name="User_server_10100" />
+        <module name="Cart_server_10501" />
+        <module name="Eureka_server_11000" />
+        <module name="Order_server_10400" />
+        <module name="Config_server_13001" />
+        <module name="Eureka_server_11001" />
+        <module name="Order_server_10401" />
+        <module name="OrderItem_server_10300" />
+        <module name="OrderItem_server_10301" />
+        <module name="Gateway_server_12000" />
+        <module name="Gateway_server_12001" />
+        <module name="Config_server_13000" />
+        <module name="Food_server_10700" />
+        <module name="Business_server_10200" />
+        <module name="DeliverAddress_server_10600" />
+      </profile>
+    </annotationProcessing>
+  </component>
+</project>
